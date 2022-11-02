@@ -1,13 +1,13 @@
 # [Choice] R version: 4, 4.2, 4.1, 4.0
-ARG VARIANT=${templateOption:imageVariant}
+ARG VARIANT=4
 # [Choice] Base image. Minimal (r-ver), tidyverse installed (tidyverse), or full image (binder): rocker/r-ver, rocker/tidyverse, rocker/binder
-ARG BASE_IMAGE=${templateOption:baseVariant}
+ARG BASE_IMAGE=rocker/binder
 FROM ${BASE_IMAGE}:${VARIANT}
 
 # [Option] Install zsh
-ARG INSTALL_ZSH="${templateOption:installZsh}"
+ARG INSTALL_ZSH="false"
 # [Option] Upgrade OS packages to their latest versions
-ARG UPGRADE_PACKAGES="${templateOption:upgradePackages}"
+ARG UPGRADE_PACKAGES="true"
 
 # Install needed packages and setup non-root user. Use a separate RUN statement to add your own dependencies.
 ARG USERNAME=rstudio
@@ -35,6 +35,12 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
         httpgd \
     && rm -rf /tmp/downloaded_packages
 
+RUN mkdir -p /home/$USERNAME/.vscode-server/extensions \
+        /home/$USERNAME/.vscode-server-insiders/extensions \
+    && chown -R $USERNAME \
+        /home/$USERNAME/.vscode-server \
+        /home/$USERNAME/.vscode-server-insiders
+
 # VSCode R Debugger dependency. Install the latest release version from GitHub without using GitHub API.
 # See https://github.com/microsoft/vscode-dev-containers/issues/1032
 RUN export TAG=$(git ls-remote --tags --refs --sort='version:refname' https://github.com/ManuelHentschel/vscDebugger v\* | tail -n 1 | cut --delimiter='/' --fields=3) \
@@ -45,7 +51,7 @@ RUN export TAG=$(git ls-remote --tags --refs --sort='version:refname' https://gi
 RUN echo 'if (interactive() && Sys.getenv("TERM_PROGRAM") == "vscode") source(file.path(Sys.getenv("HOME"), ".vscode-R", "init.R"))' >>"${R_HOME}/etc/Rprofile.site"
 
 # [Option] Enable vscode-jupyter support
-ARG ENABLE_JUPYTER="${templateOption:enableJupyter}"
+ARG ENABLE_JUPYTER="false"
 RUN if [ "${ENABLE_JUPYTER}" = "true" ]; then \
         if [ -z "$(dpkg --get-selections | grep libzmq3-dev)" ]; then \
             apt-get update \
