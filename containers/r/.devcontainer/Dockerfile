@@ -50,6 +50,11 @@ RUN export TAG=$(git ls-remote --tags --refs --sort='version:refname' https://gi
 # See more details: https://github.com/REditorSupport/vscode-R/wiki/R-Session-watcher
 RUN echo 'if (interactive() && Sys.getenv("TERM_PROGRAM") == "vscode") source(file.path(Sys.getenv("HOME"), ".vscode-R", "init.R"))' >>"${R_HOME}/etc/Rprofile.site"
 
+# [Optional] Uncomment this section to install additional OS packages.
+RUN apt-get update \
+    && export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install --no-install-recommends libaio1 unixodbc unixodbc-dev unixodbc-bin
+
 # [Option] Enable vscode-jupyter support
 ARG ENABLE_JUPYTER="false"
 RUN if [ "${ENABLE_JUPYTER}" = "true" ]; then \
@@ -65,10 +70,5 @@ RUN if [ "${ENABLE_JUPYTER}" = "true" ]; then \
         && R --vanilla -s -e 'IRkernel::installspec(user = FALSE)'; \
     fi
 
-# [Optional] Uncomment this section to install additional OS packages.
-# RUN apt-get update \
-#     && export DEBIAN_FRONTEND=noninteractive \
-#     && apt-get -y install --no-install-recommends <your-package-list-here>
-
 # [Optional] Uncomment this section to install additional R packages.
-RUN install2.r --error --skipinstalled --ncpus -1 languageserver tidyverse lubridate magrittr readxl RODBC
+RUN install2.r --error --skipinstalled --ncpus -1 languageserver tidyverse lubridate magrittr readxl DBI odbc
