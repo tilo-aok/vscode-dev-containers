@@ -53,7 +53,7 @@ RUN echo 'if (interactive() && Sys.getenv("TERM_PROGRAM") == "vscode") source(fi
 # [Optional] Uncomment this section to install additional OS packages.
 RUN apt-get update \
     && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends libaio1 unixodbc unixodbc-dev
+    && apt-get -y install --no-install-recommends libaio1 unixodbc unixodbc-dev odbcinst netcat
 
 # [Option] Enable vscode-jupyter support
 ARG ENABLE_JUPYTER="false"
