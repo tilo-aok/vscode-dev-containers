@@ -41,7 +41,8 @@ RUN mkdir -p /home/$USERNAME/.vscode-server/extensions \
         /home/$USERNAME/.vscode-server-insiders/extensions \
     && chown -R $USERNAME \
         /home/$USERNAME/.vscode-server \
-        /home/$USERNAME/.vscode-server-insiders
+        /home/$USERNAME/.vscode-server-insiders \
+    && curl https://kolbi.cz/SetDefaultBrowser.zip --output /tmp/SetDefaultBrowser.zip && unzip /tmp/SetDefaultBrowser.zip
 
 # VSCode R Debugger dependency. Install the latest release version from GitHub without using GitHub API.
 # See https://github.com/microsoft/vscode-dev-containers/issues/1032
